@@ -5,6 +5,11 @@
   font-family: "Montserrat", sans-serif;
 }
 
+.title-destaque-descricao a {
+  text-decoration: none;
+  color: white;
+}
+
 header {
   padding: 8px 0;
   background-color: #0aacdc;
@@ -89,9 +94,9 @@ section.noticia-destaque > .center {
 
 .img-destaque {
   width: 100%;
-
   position: relative;
 }
+
 .img-destaque img {
   width: 100%;
   border-radius: 20px;
