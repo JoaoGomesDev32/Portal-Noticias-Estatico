@@ -5,6 +5,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
 import Post from "./Post.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,10 +15,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 mongoose
-  .connect(
-    "mongodb+srv://joaogomesdev32:05012022@cluster0.kxlzecc.mongodb.net/portaldenoticias?retryWrites=true&w=majority&appName=Cluster0",
-    {}
-  )
+  .connect(process.env.MONGODB_URI, {})
   .then(() => {
     console.log("Connected to MongoDB");
   })
