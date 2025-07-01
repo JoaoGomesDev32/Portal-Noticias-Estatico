@@ -34,18 +34,26 @@ app.set("views", path.join(__dirname, "/pages"));
 app.get("/", async (req, res) => {
   if (req.query.busca == null) {
     try {
-      let posts = await Post.find({}).sort({ _id: -1 }).exec();
-      posts = posts.map((post) => {
-        return {
-          titulo: post.titulo,
-          conteudo: post.conteudo,
-          descricaoCurta: post.conteudo.substring(0, 100) + "...",
-          imagem: post.imagem,
-          slug: post.slug,
-          categoria: post.categoria,
-        };
-      });
-      res.render("home", { posts: posts });
+      let posts = await Post.find({}).sort({ views: -1 }).limit(3).exec();
+      let postsTop = await Post.find({}).sort({ views: -1 }).limit(5).exec();
+
+      posts = posts.map((post) => ({
+        titulo: post.titulo,
+        conteudo: post.conteudo,
+        descricaoCurta: post.conteudo.substring(0, 100) + "...",
+        imagem: post.imagem,
+        slug: post.slug,
+        categoria: post.categoria,
+      }));
+
+      postsTop = postsTop.map((post) => ({
+        titulo: post.titulo,
+        descricaoCurta: post.conteudo.substring(0, 100) + "...",
+        imagem: post.imagem,
+        slug: post.slug,
+      }));
+
+      res.render("home", { posts, postsTop });
     } catch (err) {
       console.error(err);
       res.status(500).send("Erro ao buscar posts");
@@ -62,8 +70,22 @@ app.get("/:slug", async (req, res) => {
       { $inc: { views: 1 } },
       { new: true }
     );
-    console.log(resposta);
-    res.render("single", { noticia: resposta });
+    if (!resposta) {
+      return res.status(404).send("Notícia não encontrada");
+    }
+
+    // Buscar as mais lidas
+    const postsTop = await Post.find({}).sort({ views: -1 }).limit(5).exec();
+
+    // Mapear para o formato usado no template
+    const postsTopMapped = postsTop.map((post) => ({
+      titulo: post.titulo,
+      descricaoCurta: post.conteudo.substring(0, 100) + "...",
+      imagem: post.imagem,
+      slug: post.slug,
+    }));
+
+    res.render("single", { noticia: resposta, postsTop: postsTopMapped });
   } catch (err) {
     console.error(err);
     res.status(500).send("Erro ao buscar post");
