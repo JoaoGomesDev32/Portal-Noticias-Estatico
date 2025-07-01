@@ -24,6 +24,14 @@ const postSchema = new Schema(
       required: true,
       unique: true,
     },
+    autor: {
+      type: String,
+      required: true,
+    },
+    views: {
+      type: Number,
+      default: 0,
+    },
   },
   { collection: "noticias" }
 );

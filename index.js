@@ -55,9 +55,19 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.get("/:slug", (req, res) => {
-  // res.send(req.params.slug);
-  res.render("single", {});
+app.get("/:slug", async (req, res) => {
+  try {
+    const resposta = await Post.findOneAndUpdate(
+      { slug: req.params.slug },
+      { $inc: { views: 1 } },
+      { new: true }
+    );
+    console.log(resposta);
+    res.render("single", { noticia: resposta });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erro ao buscar post");
+  }
 });
 
 app.listen(5000, () => {
