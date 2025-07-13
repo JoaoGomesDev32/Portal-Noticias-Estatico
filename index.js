@@ -126,12 +126,25 @@ app.get("/:slug", async (req, res) => {
   }
 });
 
+var usuarios = [
+  { login: "joao@email.com", senha: "123456" },
+  { login: "denize@email.com", senha: "123456" },
+];
+
+app.post("/admin/login", (req, res) => {
+  usuarios.map((usuario) => {
+    if (usuario.login === req.body.login && usuario.senha === req.body.senha) {
+      req.session.login = usuario.login;
+    }
+  });
+  res.redirect("/admin/login");
+});
+
 app.get("/admin/login", (req, res) => {
   if (req.session.login == null) {
-    req.session.login = "Felipe";
-    res.send("Sua sessão foi criada com sucesso!");
+    res.render("admin-login");
   } else {
-    res.send(req.session.login);
+    res.render("admin-panel");
   }
 });
 
