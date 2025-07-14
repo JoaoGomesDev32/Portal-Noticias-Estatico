@@ -140,6 +140,14 @@ app.post("/admin/login", (req, res) => {
   res.redirect("/admin/login");
 });
 
+app.post("/admin/cadastro", (req, res) => {
+  res.send("Cadastro realizado com sucesso!");
+});
+
+app.get("/admin/deletar/:id", (req, res) => {
+  res.send("Deletando a notícia com id: " + req.params.id);
+});
+
 app.get("/admin/login", (req, res) => {
   if (req.session.login == null) {
     res.render("admin-login");
