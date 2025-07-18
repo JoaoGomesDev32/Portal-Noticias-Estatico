@@ -4,7 +4,7 @@ import ejs from "ejs";
 import path from "path";
 import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
-import Post from "./Post.js";
+import Post from "./models/Post.js";
 import session from "express-session";
 import dotenv from "dotenv";
 
@@ -44,7 +44,7 @@ app.set("views", path.join(__dirname, "/pages"));
 app.get("/", async (req, res) => {
   if (req.query.busca == null) {
     try {
-      let posts = await Post.find({}).sort({ views: -1 }).limit(3).exec();
+      let posts = await Post.find({}).sort({ createdAt: -1 }).limit(3).exec();
       let postsTop = await Post.find({}).sort({ views: -1 }).limit(5).exec();
 
       posts = posts.map((post) => ({
@@ -63,7 +63,7 @@ app.get("/", async (req, res) => {
         slug: post.slug,
       }));
 
-      res.render("home", { posts, postsTop });
+      res.render("admin-panel", { posts, postsTop });
     } catch (err) {
       console.error(err);
       res.status(500).send("Erro ao buscar posts");
@@ -140,8 +140,33 @@ app.post("/admin/login", (req, res) => {
   res.redirect("/admin/login");
 });
 
-app.post("/admin/cadastro", (req, res) => {
-  res.send("Cadastro realizado com sucesso!");
+app.post("/admin/cadastro", async (req, res) => {
+  console.log("Recebido no cadastro:", req.body);
+  try {
+    // Checagem dos campos obrigatórios
+    if (
+      !req.body.titulo_noticia ||
+      !req.body.url_imagem ||
+      !req.body.noticia ||
+      !req.body.slug
+    ) {
+      return res.status(400).send("Todos os campos são obrigatórios!");
+    }
+    const novoPost = await Post.create({
+      titulo: req.body.titulo_noticia,
+      imagem: req.body.url_imagem,
+      categoria: "Nenhuma",
+      conteudo: req.body.noticia,
+      slug: req.body.slug,
+      autor: "Admin",
+      views: 0,
+    });
+    console.log("Post cadastrado:", novoPost);
+    res.send("Post cadastrado com sucesso!");
+  } catch (err) {
+    console.error("Erro ao cadastrar post:", err);
+    res.status(500).send("Erro ao cadastrar post: " + err.message);
+  }
 });
 
 app.get("/admin/deletar/:id", (req, res) => {
@@ -152,7 +177,11 @@ app.get("/admin/login", (req, res) => {
   if (req.session.login == null) {
     res.render("admin-login");
   } else {
-    res.render("admin-panel");
+    res.render("admin-panel", {
+      login: req.session.login,
+      posts: [],
+      mensagem: "Você já está logado!",
+    });
   }
 });
 
