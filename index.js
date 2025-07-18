@@ -8,6 +8,7 @@ import Post from "./models/Post.js";
 import session from "express-session";
 import dotenv from "dotenv";
 import postRoutes from "./routes/post.js";
+import adminRoutes from "./routes/admin.js";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 app.set("views", path.join(__dirname, "/pages"));
 
 app.use("/", postRoutes);
+app.use("/admin", adminRoutes);
 
 var usuarios = [
   { login: "joao@email.com", senha: "123456" },
