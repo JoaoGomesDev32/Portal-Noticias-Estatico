@@ -33,7 +33,7 @@ const postSchema = new Schema(
       default: 0,
     },
   },
-  { collection: "noticias" }
+  { collection: "noticias", timestamps: true }
 );
 
 const Post = mongoose.model("Post", postSchema);

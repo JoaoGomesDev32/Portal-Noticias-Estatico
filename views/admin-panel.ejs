@@ -1,0 +1,35 @@
+<%- include('partials/header.ejs') %>
+<div class="admin-panel-container">
+  <div class="header-painel">
+    <h2>Cadastro Notícia</h2>
+    <a href="/admin/logout" class="logout-link">Sair</a>
+  </div>
+  <% if (mensagem) { %>
+    <div class="feedback <%= mensagem.includes('erro') || mensagem.includes('Erro') ? 'error' : '' %>"><%= mensagem %></div>
+  <% } %>
+  <form method="post" action="/admin/cadastro" class="admin-form card">
+    <input type="text" name="titulo_noticia" placeholder="Título da Notícia" required />
+    <input type="text" name="url_imagem" placeholder="Link da imagem da notícia..." required />
+    <input type="text" name="slug" placeholder="Slug" required />
+    <textarea name="noticia" placeholder="Notícia..." required></textarea>
+    <button type="submit" class="btn mt-2">Cadastrar!</button>
+  </form>
+  <div class="header-painel mt-4">
+    <h2>Listando Notícias</h2>
+  </div>
+  <div class="noticias-lista">
+    <% if (posts && posts.length > 0) { %>
+      <% posts.forEach(function(post) { %>
+        <div class="noticia-admin-single card mb-2" style="padding:16px;display:flex;align-items:center;justify-content:space-between;">
+          <p><strong><%= post.titulo %></strong> <span style="color:#888;font-size:13px;">(<%= post.slug %>)</span></p>
+          <form method="get" action="/admin/deletar/<%= post._id %>" style="margin:0;">
+            <button type="submit" class="btn-deletar" title="Deletar">&times;</button>
+          </form>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p style="text-align:center;color:#888;">Nenhuma notícia cadastrada ainda.</p>
+    <% } %>
+  </div>
+</div>
+<%- include('partials/footer.ejs') %>
