@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import Post from "./models/Post.js";
 import session from "express-session";
 import dotenv from "dotenv";
+import postRoutes from "./routes/post.js";
 
 dotenv.config();
 
@@ -41,90 +42,7 @@ app.set("view engine", "html");
 app.use("/public", express.static(path.join(__dirname, "public")));
 app.set("views", path.join(__dirname, "/pages"));
 
-app.get("/", async (req, res) => {
-  if (req.query.busca == null) {
-    try {
-      let posts = await Post.find({}).sort({ createdAt: -1 }).limit(3).exec();
-      let postsTop = await Post.find({}).sort({ views: -1 }).limit(5).exec();
-
-      posts = posts.map((post) => ({
-        titulo: post.titulo,
-        conteudo: post.conteudo,
-        descricaoCurta: post.conteudo.substring(0, 100) + "...",
-        imagem: post.imagem,
-        slug: post.slug,
-        categoria: post.categoria,
-      }));
-
-      postsTop = postsTop.map((post) => ({
-        titulo: post.titulo,
-        descricaoCurta: post.conteudo.substring(0, 100) + "...",
-        imagem: post.imagem,
-        slug: post.slug,
-      }));
-
-      res.render("admin-panel", { posts, postsTop });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Erro ao buscar posts");
-    }
-  } else {
-    try {
-      const posts = await Post.find({
-        titulo: { $regex: req.query.busca, $options: "i" },
-      })
-        .sort({ views: -1 })
-        .exec();
-
-      // Mapear os posts para o formato usado no template
-      const postsMapped = posts.map((post) => ({
-        titulo: post.titulo,
-        conteudo: post.conteudo,
-        descricaoCurta: post.conteudo.substring(0, 100) + "...",
-        imagem: post.imagem,
-        slug: post.slug,
-        categoria: post.categoria,
-      }));
-
-      res.render("search", {
-        posts: postsMapped,
-        postCount: postsMapped.length,
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Erro ao buscar posts");
-    }
-  }
-});
-
-app.get("/:slug", async (req, res) => {
-  try {
-    const resposta = await Post.findOneAndUpdate(
-      { slug: req.params.slug },
-      { $inc: { views: 1 } },
-      { new: true }
-    );
-    if (!resposta) {
-      return res.status(404).send("Notícia não encontrada");
-    }
-
-    // Buscar as mais lidas
-    const postsTop = await Post.find({}).sort({ views: -1 }).limit(5).exec();
-
-    // Mapear para o formato usado no template
-    const postsTopMapped = postsTop.map((post) => ({
-      titulo: post.titulo,
-      descricaoCurta: post.conteudo.substring(0, 100) + "...",
-      imagem: post.imagem,
-      slug: post.slug,
-    }));
-
-    res.render("single", { noticia: resposta, postsTop: postsTopMapped });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erro ao buscar post");
-  }
-});
+app.use("/", postRoutes);
 
 var usuarios = [
   { login: "joao@email.com", senha: "123456" },
