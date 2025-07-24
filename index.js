@@ -9,6 +9,8 @@ import session from "express-session";
 import dotenv from "dotenv";
 import postRoutes from "./routes/post.js";
 import adminRoutes from "./routes/admin.js";
+import fileupload from "express-fileupload";
+import fs from "fs";
 
 dotenv.config();
 
@@ -28,6 +30,13 @@ mongoose
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(
+  fileupload({
+    useTempFiles: true,
+    tempFileDir: path.join(__dirname, "tmp"),
+  })
+);
 
 app.use(
   session({
@@ -60,12 +69,36 @@ app.post("/admin/login", (req, res) => {
 });
 
 app.post("/admin/cadastro", async (req, res) => {
+  console.log("BODY:", req.body);
+  console.log("FILES:", req.files);
+  let imagemPath = req.body.url_imagem; // padrão: usa o campo de texto
+
+  // Se um arquivo foi enviado, salve ele na pasta public/uploads
+  if (req.files && req.files.arquivo) {
+    const arquivo = req.files.arquivo;
+    const uploadPath = path.join(__dirname, "public", "uploads", arquivo.name);
+
+    // Crie a pasta uploads se não existir
+    if (!fs.existsSync(path.join(__dirname, "public", "uploads"))) {
+      fs.mkdirSync(path.join(__dirname, "public", "uploads"));
+    }
+
+    // Mova o arquivo para a pasta uploads
+    await arquivo.mv(uploadPath);
+
+    // Salve o caminho relativo para usar na aplicação
+    imagemPath = "/public/uploads/" + arquivo.name;
+    console.log("Arquivo salvo em:", uploadPath);
+  } else {
+    console.log("Nenhum arquivo recebido.");
+  }
+
   console.log("Recebido no cadastro:", req.body);
   try {
     // Checagem dos campos obrigatórios
     if (
       !req.body.titulo_noticia ||
-      !req.body.url_imagem ||
+      !imagemPath ||
       !req.body.noticia ||
       !req.body.slug
     ) {
@@ -73,7 +106,7 @@ app.post("/admin/cadastro", async (req, res) => {
     }
     const novoPost = await Post.create({
       titulo: req.body.titulo_noticia,
-      imagem: req.body.url_imagem,
+      imagem: imagemPath, // agora pode ser o link ou o arquivo enviado
       categoria: "Nenhuma",
       conteudo: req.body.noticia,
       slug: req.body.slug,
