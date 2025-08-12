@@ -25,11 +25,15 @@
     />
     <input
       type="text"
+      name="categoria"
+      placeholder="Categoria (ex.: Tecnologia, Esportes)"
+    />
+    <input
+      type="text"
       name="url_imagem"
       placeholder="Link da imagem da notícia..."
-      required
     />
-    <input type="text" name="slug" placeholder="Slug" required />
+    <input type="text" name="slug" placeholder="Slug (opcional - será gerado do título)" />
     <input type="file" name="arquivo" />
     <textarea name="noticia" placeholder="Notícia..." required></textarea>
     <button type="submit" class="btn mt-2">Cadastrar!</button>
@@ -53,7 +57,7 @@
         <span style="color: #888; font-size: 13px">(<%= post.slug %>)</span>
       </p>
       <form
-        method="get"
+        method="post"
         action="/admin/deletar/<%= post._id %>"
         style="margin: 0"
       >

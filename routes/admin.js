@@ -14,7 +14,7 @@ router.get("/login", getLogin);
 router.post("/login", postLogin);
 router.get("/panel", getPanel);
 router.post("/cadastro", postCadastro);
-router.get("/deletar/:id", getDeletar);
+router.post("/deletar/:id", getDeletar);
 router.get("/logout", getLogout);
 
 export default router; 

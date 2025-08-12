@@ -1,4 +1,11 @@
 import Post from "../models/Post.js";
+import path from "path";
+import fs from "fs";
+import slugify from "slugify";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const usuarios = [
   { login: "joao@email.com", senha: "123456" },
@@ -38,21 +45,51 @@ export const postCadastro = async (req, res) => {
     return res.redirect("/admin/login");
   }
   try {
-    if (!req.body.titulo_noticia || !req.body.url_imagem || !req.body.noticia || !req.body.slug) {
-      return res.render("admin-panel", { login: req.session.login, posts: await Post.find({}), mensagem: "Todos os campos são obrigatórios!" });
+    const titulo = (req.body.titulo_noticia || "").trim();
+    const categoria = (req.body.categoria || "Nenhuma").trim() || "Nenhuma";
+    const conteudo = (req.body.noticia || "").trim();
+    const slugInput = (req.body.slug || "").trim();
+    let imagemPath = (req.body.url_imagem || "").trim();
+
+    // Upload de arquivo opcional
+    if (req.files && req.files.arquivo) {
+      const arquivo = req.files.arquivo;
+      const uploadsDir = path.join(__dirname, "..", "public", "uploads");
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      const safeName = Date.now() + "-" + arquivo.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
+      const uploadPath = path.join(uploadsDir, safeName);
+      await arquivo.mv(uploadPath);
+      imagemPath = "/public/uploads/" + safeName;
     }
+
+    if (!titulo || !imagemPath || !conteudo) {
+      return res.render("admin-panel", {
+        login: req.session.login,
+        posts: await Post.find({}),
+        mensagem: "Todos os campos são obrigatórios!",
+      });
+    }
+
+    const slugFinal = slugInput || slugify(titulo, { lower: true, strict: true });
+
     const novoPost = await Post.create({
-      titulo: req.body.titulo_noticia,
-      imagem: req.body.url_imagem,
-      categoria: "Nenhuma",
-      conteudo: req.body.noticia,
-      slug: req.body.slug,
+      titulo,
+      imagem: imagemPath,
+      categoria,
+      conteudo,
+      slug: slugFinal,
       autor: req.session.login,
       views: 0,
     });
     res.redirect("/admin/panel");
   } catch (err) {
-    res.render("admin-panel", { login: req.session.login, posts: await Post.find({}), mensagem: "Erro ao cadastrar post: " + err.message });
+    res.render("admin-panel", {
+      login: req.session.login,
+      posts: await Post.find({}),
+      mensagem: "Erro ao cadastrar post: " + err.message,
+    });
   }
 };
 
