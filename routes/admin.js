@@ -14,7 +14,12 @@ router.get("/login", getLogin);
 router.post("/login", postLogin);
 router.get("/panel", getPanel);
 router.post("/cadastro", postCadastro);
-router.get("/deletar/:id", getDeletar);
+router.post("/deletar/:id", getDeletar);
 router.get("/logout", getLogout);
+
+// Editar Post
+import { getEditar, postEditar } from "../controllers/postController.js";
+router.get("/editar/:id", getEditar);
+router.post("/editar/:id", postEditar);
 
 export default router; 

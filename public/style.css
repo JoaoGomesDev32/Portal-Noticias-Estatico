@@ -10,6 +10,38 @@ body {
   color: #222;
 }
 
+/* Utilitários e padrões */
+.center {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+.card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(35,41,70,0.08), 0 1.5px 4px rgba(35,41,70,0.04);
+  padding: 16px;
+}
+.btn {
+  display: inline-block;
+  background: #eebf63;
+  color: #232946;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover { background: #ffd384; }
+.link { color: #232946; text-decoration: underline; }
+.link:hover { color: #121629; }
+.img-rounded { border-radius: 12px; }
+.mt-2 { margin-top: 12px; }
+.mt-4 { margin-top: 24px; }
+.mb-2 { margin-bottom: 12px; }
+.text-center { text-align: center; }
+
 /* Header moderno */
 .header-main {
   background: #232946;
@@ -110,6 +142,10 @@ body {
     width: 100%;
   }
 }
+
+/* Não exibir estourando imagem quebrada */
+img { max-width: 100%; }
+img[onerror] { background: #ddd; }
 
 /* Grid de cards responsivo */
 .ultimas {

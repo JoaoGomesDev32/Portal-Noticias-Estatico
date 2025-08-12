@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#232946" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,23 +17,22 @@
       crossorigin="anonymous"
     />
     <link href="/public/style.css" rel="stylesheet" />
-    <title>JS News</title>
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'JS News' %></title>
+    <meta name="description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : 'Portal de notícias JS News' %>" />
   </head>
   <body>
     <header class="header-main">
       <div class="center header-flex">
         <div class="logo">
-          <a href="/" class="logo-link">
+          <a href="/" class="logo-link" aria-label="Ir para a página inicial">
             <span class="logo-light">JSD</span><b class="logo-bold">News</b>
           </a>
         </div>
-        <nav class="nav-main">
-          <form action="/" class="form-busca">
+        <nav class="nav-main" aria-label="Busca no site">
+          <form action="/" class="form-busca" role="search">
             <i class="fa fa-search" aria-hidden="true"></i>
-            <input name="busca" type="text" placeholder="Buscar..." />
+            <input name="busca" type="text" placeholder="Buscar..." aria-label="Buscar notícias" />
           </form>
         </nav>
       </div>
     </header>
-  </body>
-</html>
