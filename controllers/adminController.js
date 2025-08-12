@@ -1,16 +1,26 @@
 import Post from "../models/Post.js";
+import User from "../models/User.js";
 import path from "path";
 import fs from "fs";
 import slugify from "slugify";
+import bcrypt from "bcryptjs";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const usuarios = [
-  { login: "joao@email.com", senha: "123456" },
-  { login: "denize@email.com", senha: "123456" },
-];
+// Seed mínimo de usuário admin (executa on-demand na tela de login)
+async function ensureAdminSeed() {
+  const exists = await User.findOne({ email: "admin@jsnews.dev" });
+  if (!exists) {
+    const passwordHash = await bcrypt.hash("123456", 10);
+    await User.create({
+      email: "admin@jsnews.dev",
+      name: "Administrador",
+      passwordHash,
+    });
+  }
+}
 
 export const getLogin = (req, res) => {
   if (req.session.login == null) {
@@ -21,15 +31,25 @@ export const getLogin = (req, res) => {
 };
 
 export const postLogin = (req, res) => {
-  const usuario = usuarios.find(
-    (u) => u.login === req.body.login && u.senha === req.body.senha
-  );
-  if (usuario) {
-    req.session.login = usuario.login;
-    res.redirect("/admin/panel");
-  } else {
-    res.render("admin-login", { mensagem: "Login ou senha inválidos!" });
-  }
+  return (async () => {
+    try {
+      await ensureAdminSeed();
+      const { login, senha } = req.body;
+      const user = await User.findOne({ email: login });
+      if (!user) {
+        return res.render("admin-login", { mensagem: "Login ou senha inválidos!" });
+      }
+      const ok = await bcrypt.compare(senha, user.passwordHash);
+      if (!ok) {
+        return res.render("admin-login", { mensagem: "Login ou senha inválidos!" });
+      }
+      req.session.login = user.email;
+      req.session.userName = user.name;
+      return res.redirect("/admin/panel");
+    } catch (e) {
+      return res.render("admin-login", { mensagem: "Erro ao autenticar." });
+    }
+  })();
 };
 
 export const getPanel = async (req, res) => {
@@ -52,7 +72,7 @@ export const postCadastro = async (req, res) => {
     let imagemPath = (req.body.url_imagem || "").trim();
 
     // Upload de arquivo opcional
-    if (req.files && req.files.arquivo) {
+    if (req.files && req.files.arquivo && req.files.arquivo.size > 0) {
       const arquivo = req.files.arquivo;
       const uploadsDir = path.join(__dirname, "..", "public", "uploads");
       if (!fs.existsSync(uploadsDir)) {
@@ -62,6 +82,14 @@ export const postCadastro = async (req, res) => {
       const uploadPath = path.join(uploadsDir, safeName);
       await arquivo.mv(uploadPath);
       imagemPath = "/public/uploads/" + safeName;
+    }
+
+    // Normalizar caminho de imagem: aceitar URLs http(s) ou caminho local relativo
+    if (imagemPath && !/^https?:\/\//i.test(imagemPath)) {
+      // se não começar com http, garantir prefixo /public/uploads/
+      if (!imagemPath.startsWith("/public/")) {
+        imagemPath = "/public/uploads/" + imagemPath.replace(/^\/+/, "");
+      }
     }
 
     if (!titulo || !imagemPath || !conteudo) {
@@ -80,7 +108,7 @@ export const postCadastro = async (req, res) => {
       categoria,
       conteudo,
       slug: slugFinal,
-      autor: req.session.login,
+      autor: req.session.userName || req.session.login,
       views: 0,
     });
     res.redirect("/admin/panel");

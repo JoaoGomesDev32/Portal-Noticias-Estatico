@@ -14,29 +14,32 @@
   <form
     enctype="multipart/form-data"
     method="post"
-    action="/admin/cadastro"
+    action="<%= editar ? ('/admin/editar/' + editar._id) : '/admin/cadastro' %>"
     class="admin-form card"
   >
     <input
       type="text"
       name="titulo_noticia"
       placeholder="Título da Notícia"
+      value="<%= editar ? editar.titulo : '' %>"
       required
     />
     <input
       type="text"
       name="categoria"
       placeholder="Categoria (ex.: Tecnologia, Esportes)"
+      value="<%= editar ? editar.categoria : '' %>"
     />
     <input
       type="text"
       name="url_imagem"
       placeholder="Link da imagem da notícia..."
+      value="<%= editar ? editar.imagem : '' %>"
     />
-    <input type="text" name="slug" placeholder="Slug (opcional - será gerado do título)" />
+    <input type="text" name="slug" placeholder="Slug (opcional - será gerado do título)" value="<%= editar ? editar.slug : '' %>" />
     <input type="file" name="arquivo" />
-    <textarea name="noticia" placeholder="Notícia..." required></textarea>
-    <button type="submit" class="btn mt-2">Cadastrar!</button>
+    <textarea name="noticia" placeholder="Notícia..." required><%= editar ? editar.conteudo : '' %></textarea>
+    <button type="submit" class="btn mt-2"><%= editar ? 'Salvar alterações' : 'Cadastrar!' %></button>
   </form>
   <div class="header-painel mt-4">
     <h2>Listando Notícias</h2>
@@ -65,6 +68,7 @@
           &times;
         </button>
       </form>
+      <a href="/admin/editar/<%= post._id %>" class="btn" style="margin-left:8px;">Editar</a>
     </div>
     <% }) %> <% } else { %>
     <p style="text-align: center; color: #888">

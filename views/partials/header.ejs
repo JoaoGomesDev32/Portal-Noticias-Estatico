@@ -17,7 +17,8 @@
       crossorigin="anonymous"
     />
     <link href="/public/style.css" rel="stylesheet" />
-    <title>JS News</title>
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'JS News' %></title>
+    <meta name="description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : 'Portal de notícias JS News' %>" />
   </head>
   <body>
     <header class="header-main">

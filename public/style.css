@@ -143,6 +143,10 @@ body {
   }
 }
 
+/* Não exibir estourando imagem quebrada */
+img { max-width: 100%; }
+img[onerror] { background: #ddd; }
+
 /* Grid de cards responsivo */
 .ultimas {
   display: grid;
