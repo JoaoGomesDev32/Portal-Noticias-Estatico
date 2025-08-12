@@ -5,7 +5,8 @@ import {
   getPanel,
   postCadastro,
   getDeletar,
-  getLogout
+  getLogout,
+  postImportar
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -16,6 +17,7 @@ router.get("/panel", getPanel);
 router.post("/cadastro", postCadastro);
 router.post("/deletar/:id", getDeletar);
 router.get("/logout", getLogout);
+router.post("/importar", postImportar);
 
 // Editar Post
 import { getEditar, postEditar } from "../controllers/postController.js";

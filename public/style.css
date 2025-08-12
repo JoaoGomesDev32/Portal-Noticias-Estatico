@@ -414,6 +414,7 @@ footer {
   background: #ffd384;
 }
 
+/* Admin panel styles */
 .admin-panel-container {
   max-width: 700px;
   margin: 32px auto;
@@ -422,6 +423,38 @@ footer {
   box-shadow: 0 2px 16px rgba(35,41,70,0.08), 0 1.5px 4px rgba(35,41,70,0.04);
   padding: 32px 24px;
 }
+
+.import-section {
+  background: #f8f9fa;
+  border-left: 4px solid #eebf63;
+  padding: 20px;
+}
+
+.import-section h3 {
+  color: #232946;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+}
+
+.import-section p {
+  color: #666;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+.btn-import {
+  background: #28a745;
+  color: white;
+}
+
+.btn-import:hover {
+  background: #218838;
+}
+
+.mb-3 {
+  margin-bottom: 20px;
+}
+
 .header-painel {
   width: 100%;
   padding: 10px 0;

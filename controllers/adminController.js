@@ -5,6 +5,7 @@ import fs from "fs";
 import slugify from "slugify";
 import bcrypt from "bcryptjs";
 import { fileURLToPath } from "url";
+import { importGuardianNews } from "../services/importGuardian.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -137,4 +138,31 @@ export const getLogout = (req, res) => {
   req.session.destroy(() => {
     res.redirect("/admin/login");
   });
+};
+
+// Importar notícias do Guardian
+export const postImportar = async (req, res) => {
+  if (!req.session.login) {
+    return res.redirect("/admin/login");
+  }
+  
+  try {
+    const result = await importGuardianNews();
+    const posts = await Post.find({}).sort({ createdAt: -1 });
+    
+    res.render("admin-panel", {
+      login: req.session.login,
+      posts,
+      mensagem: `Importação concluída: ${result.imported} novos, ${result.updated} atualizados`,
+    });
+  } catch (error) {
+    console.error("Erro na importação:", error);
+    const posts = await Post.find({}).sort({ createdAt: -1 });
+    
+    res.render("admin-panel", {
+      login: req.session.login,
+      posts,
+      mensagem: `Erro na importação: ${error.message}`,
+    });
+  }
 }; 

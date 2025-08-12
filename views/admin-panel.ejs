@@ -4,6 +4,16 @@
     <h2>Cadastro Notícia</h2>
     <a href="/admin/logout" class="logout-link">Sair</a>
   </div>
+  
+  <!-- Botão de importação automática -->
+  <div class="import-section card mb-3">
+    <h3>Importação Automática</h3>
+    <p>Importar notícias mais recentes do The Guardian</p>
+    <form method="post" action="/admin/importar" style="display: inline;">
+      <button type="submit" class="btn btn-import">Importar Notícias</button>
+    </form>
+  </div>
+
   <% if (mensagem) { %>
   <div
     class="feedback <%= mensagem.includes('erro') || mensagem.includes('Erro') ? 'error' : '' %>"
