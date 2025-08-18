@@ -9,7 +9,7 @@
           <a href="<%= posts[0].slug %>" class="link"><h2><%= posts[0].titulo %></h2></a>
           <p><%- posts[0].descricaoCurta %></p>
         </div>
-        <img src="<%= posts[0].imagem %>" class="img-rounded" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/public/images/landscape.jpg';" />
+        <img src="<%= /^https?:\/\//i.test(posts[0].imagem) ? ('/img-proxy?url=' + encodeURIComponent(posts[0].imagem)) : posts[0].imagem %>" class="img-rounded" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/public/images/landscape.jpg';" />
       </div>
     <% } else { %>
       <div class="feedback error">Nenhuma notícia encontrada.</div>
@@ -26,7 +26,7 @@
           <% for(let i = 1; i < Math.min(posts.length, 7); i++) { %>
           <div class="box-ultima-single card mb-2">
             <div class="img-hover-zoom">
-              <img src="<%= posts[i].imagem %>" class="img-rounded" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/public/images/landscape.jpg';" />
+              <img src="<%= /^https?:\/\//i.test(posts[i].imagem) ? ('/img-proxy?url=' + encodeURIComponent(posts[i].imagem)) : posts[i].imagem %>" class="img-rounded" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/public/images/landscape.jpg';" />
             </div>
             <div class="conteudo-noticia-single">
               <h3><%= posts[i].categoria %></h3>
@@ -43,10 +43,10 @@
       <aside class="mais-lidas card home-grid-sidebar compact-mais-lidas">
         <h3 class="mais-lidas-title"><i class="fa fa-star" style="color:#eebf63;margin-right:6px;"></i>Mais Lidas</h3>
         <div class="mas-lidas-noticias compact-mais-lidas-list">
-          <% for(let i = 0; i < Math.min(postsTop.length, 4); i++) { %>
+          <% for(let i = 0; i < Math.min(postsTop.length, 10); i++) { %>
           <div class="mais-lida-noticia-single compact-mais-lida-item">
             <div class="img-hover-zoom compact-mais-lida-img" style="width: 44px; height: 44px;">
-              <img src="<%= postsTop[i].imagem %>" class="img-rounded" style="width:100%;height:100%;object-fit:cover;" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/public/images/landscape.jpg';" />
+              <img src="<%= /^https?:\/\//i.test(postsTop[i].imagem) ? ('/img-proxy?url=' + encodeURIComponent(postsTop[i].imagem)) : postsTop[i].imagem %>" class="img-rounded" style="width:100%;height:100%;object-fit:cover;" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/public/images/landscape.jpg';" />
             </div>
             <div class="texto-mais-lida-single compact-mais-lida-text">
               <h4><%= postsTop[i].titulo %></h4>

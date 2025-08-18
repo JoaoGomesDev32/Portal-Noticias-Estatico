@@ -71,6 +71,27 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+// Proxy simples para imagens externas (evita bloqueios de hotlink/CORS)
+app.get("/img-proxy", async (req, res) => {
+  try {
+    const imageUrl = req.query.url;
+    if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) {
+      return res.status(400).send("URL inválida");
+    }
+    const upstream = await fetch(imageUrl);
+    if (!upstream.ok) {
+      return res.status(upstream.status).send("");
+    }
+    const contentType = upstream.headers.get("content-type") || "image/jpeg";
+    const arrayBuffer = await upstream.arrayBuffer();
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    return res.send(Buffer.from(arrayBuffer));
+  } catch (e) {
+    return res.status(500).send("");
+  }
+});
+
 // Cron job para importação automática (a cada 30 minutos)
 if (process.env.GUARDIAN_API_KEY) {
   cron.schedule('*/30 * * * *', async () => {

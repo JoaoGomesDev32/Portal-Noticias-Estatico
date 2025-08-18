@@ -4,8 +4,8 @@ import slugify from "slugify";
 export const getHome = async (req, res) => {
   if (!req.query.busca) {
     try {
-      let posts = await Post.find({}).sort({ createdAt: -1 }).limit(3).exec();
-      let postsTop = await Post.find({}).sort({ views: -1 }).limit(5).exec();
+      let posts = await Post.find({}).sort({ createdAt: -1 }).limit(12).exec();
+      let postsTop = await Post.find({}).sort({ views: -1 }).limit(10).exec();
 
       posts = posts.map((post) => ({
         titulo: post.titulo,
@@ -73,7 +73,7 @@ export const getSingle = async (req, res) => {
       return res.status(404).send("Notícia não encontrada");
     }
 
-    const postsTop = await Post.find({}).sort({ views: -1 }).limit(5).exec();
+    const postsTop = await Post.find({}).sort({ views: -1 }).limit(10).exec();
     const postsTopMapped = postsTop.map((post) => ({
       titulo: post.titulo,
       descricaoCurta: post.conteudo.substring(0, 100) + "...",

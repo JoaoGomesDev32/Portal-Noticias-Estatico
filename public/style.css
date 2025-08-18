@@ -240,6 +240,12 @@ img[onerror] { background: #ddd; }
   background: linear-gradient(180deg,rgba(35,41,70,0.0) 60%,rgba(35,41,70,0.7) 100%);
 }
 
+/* Margens para o título "Últimas Notícias" */
+.title-outras-noticias .section-title {
+  margin-left: 26px;
+  margin-bottom: 12px;
+}
+
 /* Mais lidas */
 .mais-lidas.card {
   background: #232946;
