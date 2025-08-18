@@ -13,6 +13,8 @@ import postRoutes from "./routes/post.js";
 import adminRoutes from "./routes/admin.js";
 import fileupload from "express-fileupload";
 import fs from "fs";
+import cron from "node-cron";
+import { importGuardianNews } from "./services/importGuardian.js";
 
 dotenv.config();
 
@@ -67,6 +69,43 @@ app.set("views", path.join(__dirname, "/views"));
 const uploadsDir = path.join(__dirname, "public", "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Proxy simples para imagens externas (evita bloqueios de hotlink/CORS)
+app.get("/img-proxy", async (req, res) => {
+  try {
+    const imageUrl = req.query.url;
+    if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) {
+      return res.status(400).send("URL inválida");
+    }
+    const upstream = await fetch(imageUrl);
+    if (!upstream.ok) {
+      return res.status(upstream.status).send("");
+    }
+    const contentType = upstream.headers.get("content-type") || "image/jpeg";
+    const arrayBuffer = await upstream.arrayBuffer();
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    return res.send(Buffer.from(arrayBuffer));
+  } catch (e) {
+    return res.status(500).send("");
+  }
+});
+
+// Cron job para importação automática (a cada 30 minutos)
+if (process.env.GUARDIAN_API_KEY) {
+  cron.schedule('*/30 * * * *', async () => {
+    try {
+      console.log('Executando importação automática...');
+      const result = await importGuardianNews();
+      console.log(`Importação automática concluída: ${result.imported} novos, ${result.updated} atualizados`);
+    } catch (error) {
+      console.error('Erro na importação automática:', error.message);
+    }
+  });
+  console.log('Cron job de importação configurado (a cada 30 minutos)');
+} else {
+  console.log('GUARDIAN_API_KEY não configurada - importação automática desabilitada');
 }
 
 app.use("/", postRoutes);
